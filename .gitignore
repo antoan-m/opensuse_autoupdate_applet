@@ -2,9 +2,12 @@ build/
 build-release/
 *.o
 *.user
+*.png
+*.jpg
 moc_*
 qrc_*
 ui_*
 .cmake/
 *.rpm
 guide.md
+releases

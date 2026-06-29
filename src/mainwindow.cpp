@@ -32,8 +32,8 @@ MainWindow::MainWindow(UpdateChecker *checker,
     , m_selfUpdater(selfUpdater)
 {
     setWindowTitle(QStringLiteral("openSUSE Update Manager"));
-    setMinimumSize(770, 660);
-    resize(770, 660);
+    setMinimumSize(770, 690);
+    resize(770, 690);
 
     auto *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -52,6 +52,10 @@ MainWindow::MainWindow(UpdateChecker *checker,
     connect(m_checker, &UpdateChecker::installOutput, this, &MainWindow::onInstallOutput);
     connect(m_checker, &UpdateChecker::passwordRequired, this, &MainWindow::onPasswordRequired);
     connect(m_selfUpdater, &SelfUpdater::updateAvailable, this, &MainWindow::onSelfUpdateAvailable);
+    connect(m_selfUpdater, &SelfUpdater::updateNotAvailable, this, [this]() {
+        m_versionStatusLabel->setText(
+            QStringLiteral("Current: %1 (up to date)").arg(QStringLiteral(APP_VERSION)));
+    });
     connect(m_selfUpdater, &SelfUpdater::installFinished, this, [this](bool success, const QString &msg) {
         if (success) {
             QMessageBox::information(this, QStringLiteral("Update Installed"), msg);
@@ -59,8 +63,12 @@ MainWindow::MainWindow(UpdateChecker *checker,
             QMessageBox::warning(this, QStringLiteral("Update Failed"), msg);
         }
     });
-    connect(m_selfUpdater, &SelfUpdater::checkFinished, this, [this](bool) {
+    connect(m_selfUpdater, &SelfUpdater::checkFinished, this, [this](bool success) {
         m_checkUpdateBtn->setEnabled(true);
+        if (!success) {
+            m_versionStatusLabel->setText(
+                QStringLiteral("Current: %1 (check failed)").arg(QStringLiteral(APP_VERSION)));
+        }
     });
     connect(m_selfUpdater, &SelfUpdater::passwordRequired, this, [this]() {
         bool ok;
@@ -567,7 +575,7 @@ QWidget *MainWindow::createAboutTab()
     nameLabel->setAlignment(Qt::AlignCenter);
     layout->addWidget(nameLabel);
 
-    auto *versionLabel = new QLabel(QStringLiteral("Version 1.0.0"));
+    auto *versionLabel = new QLabel(QStringLiteral("Version %1").arg(QStringLiteral(APP_VERSION)));
     versionLabel->setObjectName(QStringLiteral("subheading"));
     versionLabel->setAlignment(Qt::AlignCenter);
     layout->addWidget(versionLabel);

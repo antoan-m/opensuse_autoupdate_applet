@@ -10,7 +10,9 @@ A Qt6 system tray applet that periodically checks for openSUSE system updates an
 - **Desktop notifications** — shows update counts per package manager (zypper / flatpak / snap)
 - **Update list** — view all available updates in a checkable tree, select which to install
 - **Install updates** — install all or selected updates with one click
-- **Auto-update** — silently apply updates without interaction (optional)
+- **Auto-update system** — silently apply system updates without interaction (optional)
+- **Auto-update app** — automatically download and install new versions of the app when released
+- **Self-update** — checks GitHub for new releases, with manual or automatic install
 - **Lock packages** — prevent specific packages from being updated (uses `zypper addlock`)
 - **Sudo password management** — store password in system keychain (qtkeychain) to avoid prompts
 - **Configurable interval** — 15 min to 24 hours, or manual only
@@ -22,10 +24,19 @@ A Qt6 system tray applet that periodically checks for openSUSE system updates an
 
 ### Option 1: Prebuilt RPM (easiest)
 
-Download the latest `.rpm` from the [Releases](https://github.com/antoan-m/opensuse_autoupdate_applet/releases) page and install:
+Download the latest `.rpm` and `pubkey.asc` from the [Releases](https://github.com/antoan-m/opensuse_autoupdate_applet/releases) page, then:
 
 ```bash
+# Import the signing key (one-time)
+sudo rpm --import pubkey.asc
+
+# Install
 sudo zypper install opensuse-update-applet-*.rpm
+```
+
+To skip signature verification:
+```bash
+sudo zypper install --no-gpg-checks opensuse-update-applet-*.rpm
 ```
 
 ### Option 2: Build from Source
