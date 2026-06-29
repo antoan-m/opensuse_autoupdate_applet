@@ -11,3 +11,4 @@ ui_*
 *.rpm
 guide.md
 releases
+pubkey.asc
