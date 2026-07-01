@@ -75,8 +75,7 @@ void UpdateChecker::runZypperListUpdates()
         }
     });
     p->start(QStringLiteral("zypper"), QStringList()
-             << QStringLiteral("list-updates")
-             << QStringLiteral("--best-effort"));
+             << QStringLiteral("list-updates"));
 }
 
 void UpdateChecker::runFlatpakListUpdates()
@@ -302,7 +301,7 @@ QList<UpdateInfo> UpdateChecker::parseZypperUpdates(const QByteArray &output)
     QStringList lines = text.split(QRegularExpression(QStringLiteral("[\r\n]+")));
 
     for (const QString &line : lines) {
-        if (!line.startsWith(QStringLiteral("v |")) && !line.startsWith(QStringLiteral("v|")))
+        if (!line.startsWith(QStringLiteral("v |")) && !line.startsWith(QStringLiteral("v  |")) && !line.startsWith(QStringLiteral("v|")))
             continue;
         QStringList parts = line.split(QStringLiteral("|"));
         if (parts.size() < 6)
