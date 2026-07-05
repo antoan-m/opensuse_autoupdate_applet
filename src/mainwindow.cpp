@@ -36,8 +36,8 @@ MainWindow::MainWindow(UpdateChecker *checker,
     , m_selfUpdater(selfUpdater)
 {
     setWindowTitle(QStringLiteral("oSS Update Manager"));
-    setMinimumSize(770, 690);
-    resize(770, 690);
+    setMinimumSize(770, 740);
+    resize(770, 740);
 
     auto *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 0, 0);
