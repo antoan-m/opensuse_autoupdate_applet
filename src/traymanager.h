@@ -22,7 +22,7 @@ public:
                           QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information,
                           int durationMs = 5000);
 
-    enum IconState { Idle, Checking, UpdatesAvailable, RebootRequired };
+    enum IconState { Idle, Checking, UpdatesAvailable };
     void setIconState(IconState state);
 
 signals:
@@ -35,7 +35,6 @@ private slots:
     void onUpdatesFound(const QList<UpdateInfo> &updates);
     void onCheckStarted();
     void onCheckFinished(bool success);
-    void onRebootRequired();
 
 private:
     void buildMenu();

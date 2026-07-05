@@ -129,12 +129,6 @@ QLabel#subheading {
     color: #6c7086;
 }
 
-QLabel#warning {
-    font-size: 13px;
-    color: #e67e22;
-    font-weight: bold;
-}
-
 QLabel#count {
     font-size: 36px;
     font-weight: bold;

@@ -95,7 +95,6 @@ private:
     QTreeWidget *m_updateTree;
     QProgressBar *m_progressBar;
     QLabel *m_progressLabel;
-    QLabel *m_rebootStatusLabel;
 
     // Settings tab
     QComboBox *m_intervalCombo;

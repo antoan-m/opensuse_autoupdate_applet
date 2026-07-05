@@ -49,21 +49,12 @@ MainWindow::MainWindow(UpdateChecker *checker,
     m_tabs->addTab(createAboutTab(), QStringLiteral("About"));
     mainLayout->addWidget(m_tabs);
 
-    connect(m_checker, &UpdateChecker::checkStarted, this, [this]() {
-        m_rebootStatusLabel->setVisible(false);
-    });
     connect(m_checker, &UpdateChecker::checkFinished, this, &MainWindow::onCheckFinished);
     connect(m_checker, &UpdateChecker::updatesFound, this, &MainWindow::onUpdatesFound);
-    connect(m_checker, &UpdateChecker::installStarted, this, [this]() {
-        m_rebootStatusLabel->setVisible(false);
-    });
     connect(m_checker, &UpdateChecker::installFinished, this, &MainWindow::onInstallFinished);
     connect(m_checker, &UpdateChecker::installProgress, this, &MainWindow::onInstallProgress);
     connect(m_checker, &UpdateChecker::installOutput, this, &MainWindow::onInstallOutput);
     connect(m_checker, &UpdateChecker::passwordRequired, this, &MainWindow::onPasswordRequired);
-    connect(m_checker, &UpdateChecker::rebootRequired, this, [this]() {
-        m_rebootStatusLabel->setVisible(true);
-    });
     connect(m_selfUpdater, &SelfUpdater::updateAvailable, this, &MainWindow::onSelfUpdateAvailable);
     connect(m_selfUpdater, &SelfUpdater::updateNotAvailable, this, [this]() {
         m_versionStatusLabel->setText(
@@ -248,12 +239,6 @@ QWidget *MainWindow::createHomeTab()
 
     m_statusLabel = new QLabel(QStringLiteral("Ready"));
     statusLayout->addWidget(m_statusLabel);
-
-    m_rebootStatusLabel = new QLabel(
-        QStringLiteral("Logout or reboot may be required to complete updates."));
-    m_rebootStatusLabel->setObjectName(QStringLiteral("warning"));
-    m_rebootStatusLabel->setVisible(false);
-    statusLayout->addWidget(m_rebootStatusLabel);
 
     m_progressLabel = new QLabel();
     m_progressLabel->setVisible(false);
@@ -533,7 +518,6 @@ void MainWindow::onInstallSelected()
                                  QStringLiteral("No zypper packages selected."));
         return;
     }
-    m_rebootStatusLabel->setVisible(false);
     m_checker->installSelected(pkgs);
 }
 
@@ -551,7 +535,6 @@ void MainWindow::onInstallAll()
                                  QStringLiteral("All packages are up to date."));
         return;
     }
-    m_rebootStatusLabel->setVisible(false);
     m_checker->installAll();
 }
 
@@ -584,7 +567,6 @@ void MainWindow::onInstallFinished(bool success, const QString &message)
         populateUpdateTree({});
     } else {
         m_statusLabel->setText(QStringLiteral("Installation failed"));
-        m_rebootStatusLabel->setVisible(false);
         QMessageBox::warning(this, QStringLiteral("Installation Failed"), message);
     }
 }

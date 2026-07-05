@@ -103,7 +103,6 @@ void UpdateChecker::checkNow()
     m_snapUpdates.clear();
     m_allUpdates.clear();
     m_pendingChecks = 0;
-    m_rebootRequired = false;
 
     emit checkStarted();
 
@@ -213,9 +212,6 @@ void UpdateChecker::allChecksDone()
 
     if (Settings::instance()->autoUpdate() && totalCount() > 0) {
         installAll();
-    } else if (m_pendingRebootNotification) {
-        emit rebootRequired();
-        m_pendingRebootNotification = false;
     }
 }
 
@@ -325,11 +321,6 @@ void UpdateChecker::finishAllInstalls(bool success, const QString &message)
     m_installPhase = PhaseNone;
     m_cachedSudoPassword.clear();
 
-    if (m_rebootRequired)
-        m_pendingRebootNotification = true;
-
-    m_rebootRequired = false;
-
     if (success) {
         m_zypperUpdates.clear();
         m_flatpakUpdates.clear();
@@ -338,7 +329,6 @@ void UpdateChecker::finishAllInstalls(bool success, const QString &message)
     }
 
     emit installFinished(success, message);
-
     if (success)
         checkNow();
 }
@@ -427,12 +417,7 @@ void UpdateChecker::onInstallProcessFinished()
             finishAllInstalls(false, msg);
             return;
         }
-        if (ec == 4 || ec == 5) {
-            m_rebootRequired = true;
-            emit installOutput(QStringLiteral("Zypper updates done (logout or reboot may be required)"));
-        } else {
-            emit installOutput(QStringLiteral("Zypper updates done"));
-        }
+        emit installOutput(QStringLiteral("Zypper updates done"));
         if (!m_flatpakUpdates.isEmpty()) {
             doFlatpakInstall();
             return;

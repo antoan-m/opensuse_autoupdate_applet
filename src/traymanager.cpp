@@ -34,8 +34,6 @@ TrayManager::TrayManager(UpdateChecker *checker, QWidget *mainWindow, QObject *p
             this, &TrayManager::onCheckStarted);
     connect(m_checker, &UpdateChecker::checkFinished,
             this, &TrayManager::onCheckFinished);
-    connect(m_checker, &UpdateChecker::rebootRequired,
-            this, &TrayManager::onRebootRequired);
 }
 
 TrayManager::~TrayManager()
@@ -120,22 +118,6 @@ static QIcon paintSymbolicIcon(const QString &shape)
         p.drawLine(QPointF(cx, cy - r * 0.35), QPointF(cx, cy + r * 0.1));
         qreal dotR = 1.5 * dpr;
         p.drawEllipse(QPointF(cx, cy + r * 0.35), dotR, dotR);
-    } else if (shape == QStringLiteral("reboot")) {
-        qreal arcR = r * 0.7;
-        QPen arcPen(color, 2.0 * dpr, Qt::SolidLine, Qt::RoundCap);
-        p.setPen(arcPen);
-        QPainterPath arcPath;
-        arcPath.arcMoveTo(cx - arcR, cy - arcR, arcR * 2, arcR * 2, 90);
-        arcPath.arcTo(cx - arcR, cy - arcR, arcR * 2, arcR * 2, 90, -270);
-        p.drawPath(arcPath);
-        QPainterPath arrowPath;
-        arrowPath.moveTo(cx + arcR + 0.5 * dpr, cy - arcR + 0.5 * dpr);
-        arrowPath.lineTo(cx + arcR - 4 * dpr, cy - arcR + 4 * dpr);
-        arrowPath.lineTo(cx + arcR + 4 * dpr, cy - arcR + 4 * dpr);
-        arrowPath.closeSubpath();
-        p.setBrush(color);
-        p.setPen(Qt::NoPen);
-        p.drawPath(arrowPath);
     }
 
     p.end();
@@ -152,7 +134,6 @@ void TrayManager::createIcon(IconState state)
         case Idle:              shape = QStringLiteral("idle"); break;
         case Checking:          shape = QStringLiteral("checking"); break;
         case UpdatesAvailable:  shape = QStringLiteral("updates"); break;
-        case RebootRequired:    shape = QStringLiteral("reboot"); break;
         }
         m_trayIcon->setIcon(paintSymbolicIcon(shape));
         return;
@@ -164,7 +145,6 @@ void TrayManager::createIcon(IconState state)
     case Idle:              name = QStringLiteral("idle"); break;
     case Checking:          name = QStringLiteral("checking"); break;
     case UpdatesAvailable:  name = QStringLiteral("updates"); break;
-    case RebootRequired:    name = QStringLiteral("reboot"); break;
     }
     m_trayIcon->setIcon(QIcon(prefix.arg(name)));
 }
@@ -185,8 +165,7 @@ void TrayManager::onUpdatesFound(const QList<UpdateInfo> &updates)
 {
     int total = updates.size();
     if (total > 0) {
-        if (m_currentState != RebootRequired)
-            setIconState(UpdatesAvailable);
+        setIconState(UpdatesAvailable);
 
         int zypper = m_checker->zypperCount();
         int flatpak = m_checker->flatpakCount();
@@ -202,7 +181,7 @@ void TrayManager::onUpdatesFound(const QList<UpdateInfo> &updates)
         showNotification(
             QStringLiteral("Updates Available"),
             QStringLiteral("%1 updates available\n%2").arg(total).arg(msg));
-    } else if (m_currentState != RebootRequired) {
+    } else {
         setIconState(Idle);
     }
 }
@@ -210,24 +189,14 @@ void TrayManager::onUpdatesFound(const QList<UpdateInfo> &updates)
 void TrayManager::onCheckStarted()
 {
     m_checkAction->setEnabled(false);
-    if (m_currentState != RebootRequired)
-        setIconState(Checking);
+    setIconState(Checking);
     m_lastCheckAction->setText(QStringLiteral("Checking..."));
-}
-
-void TrayManager::onRebootRequired()
-{
-    setIconState(RebootRequired);
-    showNotification(
-        QStringLiteral("System Restart Recommended"),
-        QStringLiteral("Logout or reboot may be required to complete updates."),
-        QSystemTrayIcon::Warning, 8000);
 }
 
 void TrayManager::onCheckFinished(bool success)
 {
     m_checkAction->setEnabled(true);
-    if (m_currentState != RebootRequired && m_checker->totalCount() == 0)
+    if (m_checker->totalCount() == 0)
         setIconState(Idle);
 
     if (success) {
