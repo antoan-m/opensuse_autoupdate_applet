@@ -276,7 +276,7 @@ void UpdateChecker::doInstall(const QString &pwd, const QStringList &pkgs)
     args << QStringLiteral("-S") << QStringLiteral("zypper");
 
     if (pkgs.isEmpty()) {
-        args << QStringLiteral("dup") << QStringLiteral("--no-confirm");
+        args << QStringLiteral("up") << QStringLiteral("--no-confirm");
     } else {
         args << QStringLiteral("install") << QStringLiteral("--no-confirm");
         for (const QString &pkg : pkgs)
