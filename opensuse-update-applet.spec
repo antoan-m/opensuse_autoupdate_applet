@@ -47,6 +47,8 @@ locking, and sudo password storage via system keychain.
 
 %changelog
 * Sun Jul 05 2026 antoan-m <antoan@localhost.localdomain> 1.2.0-1
+- Fix: reboot warning label shown from stale state instead of after install
+- Add installStarted signal to properly sequence hide-then-show-logic
 - Reboot/restart notification: tray icon + popup when updates require it
 - Orange warning label in Home tab when reboot is needed
 - Fixes:

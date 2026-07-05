@@ -269,6 +269,7 @@ void UpdateChecker::doInstall(const QString &pwd, const QStringList &pkgs)
     m_completedCount = 0;
     m_installPhase = PhaseZypper;
     m_cachedSudoPassword = pwd;
+    emit installStarted();
     emit installProgress(0);
     emit installOutput(QStringLiteral("Starting zypper updates..."));
 

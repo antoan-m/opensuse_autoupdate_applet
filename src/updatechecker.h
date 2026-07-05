@@ -44,6 +44,7 @@ signals:
     void checkStarted();
     void checkFinished(bool success);
     void updatesFound(const QList<UpdateInfo> &updates);
+    void installStarted();
     void installProgress(int percent);
     void installOutput(const QString &line);
     void installFinished(bool success, const QString &message);

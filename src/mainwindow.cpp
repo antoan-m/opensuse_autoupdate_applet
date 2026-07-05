@@ -51,6 +51,9 @@ MainWindow::MainWindow(UpdateChecker *checker,
 
     connect(m_checker, &UpdateChecker::checkFinished, this, &MainWindow::onCheckFinished);
     connect(m_checker, &UpdateChecker::updatesFound, this, &MainWindow::onUpdatesFound);
+    connect(m_checker, &UpdateChecker::installStarted, this, [this]() {
+        m_rebootStatusLabel->setVisible(false);
+    });
     connect(m_checker, &UpdateChecker::installFinished, this, &MainWindow::onInstallFinished);
     connect(m_checker, &UpdateChecker::installProgress, this, &MainWindow::onInstallProgress);
     connect(m_checker, &UpdateChecker::installOutput, this, &MainWindow::onInstallOutput);
@@ -527,6 +530,7 @@ void MainWindow::onInstallSelected()
                                  QStringLiteral("No zypper packages selected."));
         return;
     }
+    m_rebootStatusLabel->setVisible(false);
     m_checker->installSelected(pkgs);
 }
 
@@ -544,6 +548,7 @@ void MainWindow::onInstallAll()
                                  QStringLiteral("All packages are up to date."));
         return;
     }
+    m_rebootStatusLabel->setVisible(false);
     m_checker->installAll();
 }
 
