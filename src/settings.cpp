@@ -76,6 +76,19 @@ void Settings::setAutoUpdateApp(bool enabled)
     }
 }
 
+int Settings::zypperMode() const
+{
+    return m_settings.value(QStringLiteral("zypper_mode"), 0).toInt();
+}
+
+void Settings::setZypperMode(int mode)
+{
+    if (mode != zypperMode()) {
+        m_settings.setValue(QStringLiteral("zypper_mode"), mode);
+        emit zypperModeChanged(mode);
+    }
+}
+
 bool Settings::useSymbolicIcons() const
 {
     return m_settings.value(QStringLiteral("symbolic_icons"), false).toBool();

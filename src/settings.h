@@ -27,12 +27,16 @@ public:
     bool autoUpdateApp() const;
     void setAutoUpdateApp(bool enabled);
 
+    int zypperMode() const; // 0 = up, 1 = dup
+    void setZypperMode(int mode);
+
 signals:
     void checkIntervalChanged(int minutes);
     void autoStartChanged(bool enabled);
     void autoUpdateChanged(bool enabled);
     void autoUpdateAppChanged(bool enabled);
     void iconStyleChanged(bool symbolic);
+    void zypperModeChanged(int mode);
 
 private:
     Settings();

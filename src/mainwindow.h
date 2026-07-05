@@ -98,6 +98,7 @@ private:
 
     // Settings tab
     QComboBox *m_intervalCombo;
+    QComboBox *m_zypperModeCombo;
     QCheckBox *m_autoStartCheck;
     QCheckBox *m_autoUpdateCheck;
     QComboBox *m_iconStyleCombo;

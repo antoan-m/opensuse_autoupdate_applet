@@ -296,6 +296,16 @@ QWidget *MainWindow::createSettingsTab()
     intervalRow->addStretch();
     checkLayout->addLayout(intervalRow);
 
+    auto *modeRow = new QHBoxLayout();
+    modeRow->addWidget(new QLabel(QStringLiteral("Install mode:")));
+    m_zypperModeCombo = new QComboBox();
+    m_zypperModeCombo->addItem(QStringLiteral("zypper up (safe)"), 0);
+    m_zypperModeCombo->addItem(QStringLiteral("zypper dup (dist upgrade)"), 1);
+    m_zypperModeCombo->setCurrentIndex(Settings::instance()->zypperMode());
+    modeRow->addWidget(m_zypperModeCombo);
+    modeRow->addStretch();
+    checkLayout->addLayout(modeRow);
+
     m_autoUpdateCheck = new QCheckBox(QStringLiteral("Auto-apply system updates silently (no confirmation)"));
     m_autoUpdateCheck->setChecked(Settings::instance()->autoUpdate());
     checkLayout->addWidget(m_autoUpdateCheck);
@@ -363,6 +373,10 @@ QWidget *MainWindow::createSettingsTab()
 
     connect(m_intervalCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &MainWindow::onIntervalChanged);
+    connect(m_zypperModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this](int index) {
+        Settings::instance()->setZypperMode(m_zypperModeCombo->itemData(index).toInt());
+    });
     connect(m_autoStartCheck, &QCheckBox::toggled, this, &MainWindow::onAutoStartToggled);
     connect(m_autoUpdateCheck, &QCheckBox::toggled, this, &MainWindow::onAutoUpdateToggled);
     connect(m_autoUpdateAppCheck, &QCheckBox::toggled, this, [this](bool checked) {
