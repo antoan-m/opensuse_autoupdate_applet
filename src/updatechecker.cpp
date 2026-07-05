@@ -213,6 +213,9 @@ void UpdateChecker::allChecksDone()
 
     if (Settings::instance()->autoUpdate() && totalCount() > 0) {
         installAll();
+    } else if (m_pendingRebootNotification) {
+        emit rebootRequired();
+        m_pendingRebootNotification = false;
     }
 }
 
@@ -322,6 +325,11 @@ void UpdateChecker::finishAllInstalls(bool success, const QString &message)
     m_installPhase = PhaseNone;
     m_cachedSudoPassword.clear();
 
+    if (m_rebootRequired)
+        m_pendingRebootNotification = true;
+
+    m_rebootRequired = false;
+
     if (success) {
         m_zypperUpdates.clear();
         m_flatpakUpdates.clear();
@@ -329,16 +337,10 @@ void UpdateChecker::finishAllInstalls(bool success, const QString &message)
         m_allUpdates.clear();
     }
 
-    bool needsReboot = m_rebootRequired;
-    m_rebootRequired = false;
-
     emit installFinished(success, message);
 
     if (success)
         checkNow();
-
-    if (needsReboot)
-        emit rebootRequired();
 }
 
 void UpdateChecker::installFlatpakUpdates()

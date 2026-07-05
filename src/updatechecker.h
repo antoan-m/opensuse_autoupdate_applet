@@ -98,4 +98,5 @@ private:
     InstallPhase m_installPhase;
     QString m_cachedSudoPassword;
     bool m_rebootRequired = false;
+    bool m_pendingRebootNotification = false;
 };

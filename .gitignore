@@ -12,3 +12,5 @@ ui_*
 guide.md
 releases
 pubkey.asc
+.opencode
+.gitignore
