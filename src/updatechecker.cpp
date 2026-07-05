@@ -329,13 +329,16 @@ void UpdateChecker::finishAllInstalls(bool success, const QString &message)
         m_allUpdates.clear();
     }
 
+    bool needsReboot = m_rebootRequired;
+    m_rebootRequired = false;
+
     emit installFinished(success, message);
-    if (m_rebootRequired) {
-        emit rebootRequired();
-        m_rebootRequired = false;
-    }
+
     if (success)
         checkNow();
+
+    if (needsReboot)
+        emit rebootRequired();
 }
 
 void UpdateChecker::installFlatpakUpdates()

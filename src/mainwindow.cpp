@@ -49,6 +49,9 @@ MainWindow::MainWindow(UpdateChecker *checker,
     m_tabs->addTab(createAboutTab(), QStringLiteral("About"));
     mainLayout->addWidget(m_tabs);
 
+    connect(m_checker, &UpdateChecker::checkStarted, this, [this]() {
+        m_rebootStatusLabel->setVisible(false);
+    });
     connect(m_checker, &UpdateChecker::checkFinished, this, &MainWindow::onCheckFinished);
     connect(m_checker, &UpdateChecker::updatesFound, this, &MainWindow::onUpdatesFound);
     connect(m_checker, &UpdateChecker::installStarted, this, [this]() {
