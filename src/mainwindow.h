@@ -9,6 +9,7 @@
 #include <QLineEdit>
 #include <QListWidget>
 #include <QCheckBox>
+#include <QTreeWidget>
 
 #include "updatechecker.h"
 
@@ -38,8 +39,11 @@ signals:
 
 private slots:
     void onCheckNow();
-    void onViewUpdates();
     void onInstallAll();
+    void onSelectAll();
+    void onDeselectAll();
+    void onInstallSelected();
+    void onLockSelected();
     void onCheckFinished(bool success);
     void onUpdatesFound(const QList<UpdateInfo> &updates);
     void onInstallFinished(bool success, const QString &message);
@@ -64,6 +68,8 @@ private:
     QWidget *createSettingsTab();
     QWidget *createLocksTab();
     QWidget *createAboutTab();
+    void populateUpdateTree(const QList<UpdateInfo> &updates);
+    QStringList selectedZypperPackages() const;
     void updatePasswordIndicator();
 
     UpdateChecker *m_checker;
@@ -81,8 +87,12 @@ private:
     QLabel *m_statusLabel;
     QLabel *m_lastCheckLabel;
     QPushButton *m_checkNowBtn;
-    QPushButton *m_viewUpdatesBtn;
     QPushButton *m_installAllBtn;
+    QPushButton *m_installSelectedBtn;
+    QPushButton *m_lockSelectedBtn;
+    QPushButton *m_selectAllBtn;
+    QPushButton *m_deselectAllBtn;
+    QTreeWidget *m_updateTree;
     QProgressBar *m_progressBar;
     QLabel *m_progressLabel;
 

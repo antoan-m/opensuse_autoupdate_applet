@@ -62,7 +62,12 @@ private:
     void runSnapListUpdates();
     void allChecksDone();
     void doInstall(const QString &pwd, const QStringList &pkgs = {});
+    void doFlatpakInstall();
+    void doSnapInstall(const QString &pwd);
+    void finishAllInstalls(bool success, const QString &message);
     void startTimer();
+
+    enum InstallPhase { PhaseNone, PhaseZypper, PhaseFlatpak, PhaseSnap };
 
     QList<UpdateInfo> parseZypperUpdates(const QByteArray &output);
     QList<UpdateInfo> parseFlatpakUpdates(const QByteArray &output);
@@ -84,4 +89,10 @@ private:
     QDateTime m_lastCheckTime;
 
     QStringList m_pendingInstallPackages;
+
+    QString m_installBuffer;
+    int m_expectedTotal;
+    int m_completedCount;
+    InstallPhase m_installPhase;
+    QString m_cachedSudoPassword;
 };

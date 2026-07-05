@@ -1,7 +1,7 @@
 %define _name opensuse-update-applet
 
 Name:           opensuse-update-applet
-Version:        1.1.0
+Version:        1.1.1
 Release:        1
 Summary:        System tray applet for openSUSE zypper/flatpak/snap updates
 License:        GPL-3.0-only

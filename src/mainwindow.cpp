@@ -4,7 +4,6 @@
 #include "passwordmanager.h"
 #include "autostartmanager.h"
 #include "selfupdater.h"
-#include "updatelistdialog.h"
 #include "settings.h"
 
 #include <QVBoxLayout>
@@ -17,6 +16,10 @@
 #include <QDateTime>
 #include <QCloseEvent>
 #include <QTimer>
+#include <QHeaderView>
+#include <QPainter>
+#include <QPainterPath>
+#include <QGuiApplication>
 
 MainWindow::MainWindow(UpdateChecker *checker,
                        LockManager *lockManager,
@@ -92,13 +95,34 @@ void MainWindow::closeEvent(QCloseEvent *event)
     hide();
     event->ignore();
 }
+static QIcon paintCheckIcon(bool checked)
+{
+    int s = 20;
+    QPixmap pm(s, s);
+    pm.fill(Qt::transparent);
+    QPainter p(&pm);
+    p.setRenderHint(QPainter::Antialiasing);
+    QColor c = QGuiApplication::palette().color(QPalette::WindowText);
+    p.setPen(QPen(c, 1.5));
+    p.drawRoundedRect(2, 2, s - 4, s - 4, 3, 3);
+    if (checked) {
+        p.setPen(QPen(c, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+        QPainterPath path;
+        path.moveTo(5, s / 2);
+        path.lineTo(s / 2 - 1, s - 6);
+        path.lineTo(s - 4, 5);
+        p.drawPath(path);
+    }
+    p.end();
+    return QIcon(pm);
+}
 
 QWidget *MainWindow::createHomeTab()
 {
     auto *widget = new QWidget();
     auto *layout = new QVBoxLayout(widget);
     layout->setContentsMargins(24, 24, 24, 24);
-    layout->setSpacing(16);
+    layout->setSpacing(12);
 
     auto *headerLabel = new QLabel(QStringLiteral("System Updates"));
     headerLabel->setObjectName(QStringLiteral("heading"));
@@ -151,19 +175,60 @@ QWidget *MainWindow::createHomeTab()
     layout->addWidget(cardWidget);
 
     auto *btnRow = new QHBoxLayout();
-    btnRow->setSpacing(12);
+    btnRow->setSpacing(6);
+
+    m_selectAllBtn = new QPushButton();
+    m_selectAllBtn->setIcon(paintCheckIcon(true));
+    m_selectAllBtn->setIconSize(QSize(18, 18));
+    m_selectAllBtn->setFixedSize(30, 30);
+    m_selectAllBtn->setToolTip(QStringLiteral("Select all"));
+    btnRow->addWidget(m_selectAllBtn);
+
+    m_deselectAllBtn = new QPushButton();
+    m_deselectAllBtn->setIcon(paintCheckIcon(false));
+    m_deselectAllBtn->setIconSize(QSize(18, 18));
+    m_deselectAllBtn->setFixedSize(30, 30);
+    m_deselectAllBtn->setToolTip(QStringLiteral("Deselect all"));
+    btnRow->addWidget(m_deselectAllBtn);
+
+    btnRow->addSpacing(8);
 
     m_checkNowBtn = new QPushButton(QStringLiteral("Check Now"));
     btnRow->addWidget(m_checkNowBtn);
 
-    m_viewUpdatesBtn = new QPushButton(QStringLiteral("View & Install Updates"));
-    btnRow->addWidget(m_viewUpdatesBtn);
-
     m_installAllBtn = new QPushButton(QStringLiteral("Install All"));
     btnRow->addWidget(m_installAllBtn);
 
+    m_installSelectedBtn = new QPushButton(QStringLiteral("Install Selected"));
+    btnRow->addWidget(m_installSelectedBtn);
+
+    m_lockSelectedBtn = new QPushButton(QStringLiteral("Lock Selected"));
+    m_lockSelectedBtn->setObjectName(QStringLiteral("secondary"));
+    btnRow->addWidget(m_lockSelectedBtn);
+
     btnRow->addStretch();
     layout->addLayout(btnRow);
+
+    m_updateTree = new QTreeWidget();
+    m_updateTree->setColumnCount(5);
+    m_updateTree->setHeaderLabels({
+        QStringLiteral("Package"),
+        QStringLiteral("Repository"),
+        QStringLiteral("Current Version"),
+        QStringLiteral("New Version"),
+        QStringLiteral("Type")
+    });
+    m_updateTree->setRootIsDecorated(false);
+    m_updateTree->setAlternatingRowColors(true);
+    m_updateTree->setSortingEnabled(true);
+    m_updateTree->setMinimumHeight(120);
+    m_updateTree->header()->setStretchLastSection(false);
+    m_updateTree->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+    m_updateTree->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    m_updateTree->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    m_updateTree->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+    m_updateTree->header()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
+    layout->addWidget(m_updateTree, 1);
 
     auto *statusGroup = new QGroupBox(QStringLiteral("Status"));
     auto *statusLayout = new QVBoxLayout(statusGroup);
@@ -184,11 +249,13 @@ QWidget *MainWindow::createHomeTab()
     statusLayout->addWidget(m_progressBar);
 
     layout->addWidget(statusGroup);
-    layout->addStretch();
 
     connect(m_checkNowBtn, &QPushButton::clicked, this, &MainWindow::onCheckNow);
-    connect(m_viewUpdatesBtn, &QPushButton::clicked, this, &MainWindow::onViewUpdates);
     connect(m_installAllBtn, &QPushButton::clicked, this, &MainWindow::onInstallAll);
+    connect(m_installSelectedBtn, &QPushButton::clicked, this, &MainWindow::onInstallSelected);
+    connect(m_lockSelectedBtn, &QPushButton::clicked, this, &MainWindow::onLockSelected);
+    connect(m_selectAllBtn, &QPushButton::clicked, this, &MainWindow::onSelectAll);
+    connect(m_deselectAllBtn, &QPushButton::clicked, this, &MainWindow::onDeselectAll);
 
     return widget;
 }
@@ -381,24 +448,79 @@ void MainWindow::onCheckNow()
     m_checker->checkNow();
 }
 
-void MainWindow::onViewUpdates()
+void MainWindow::populateUpdateTree(const QList<UpdateInfo> &updates)
 {
-    QList<UpdateInfo> updates = m_checker->updates();
+    m_updateTree->clear();
     if (updates.isEmpty()) {
-        QMessageBox::information(this, QStringLiteral("No Updates"),
-                                 QStringLiteral("All packages are up to date."));
+        auto *item = new QTreeWidgetItem();
+        item->setText(0, QStringLiteral("All packages are up to date"));
+        for (int i = 1; i < 5; ++i)
+            item->setText(i, QString());
+        item->setFlags(Qt::NoItemFlags);
+        item->setForeground(0, QGuiApplication::palette().color(QPalette::Disabled, QPalette::Text));
+        m_updateTree->addTopLevelItem(item);
+        m_selectAllBtn->setEnabled(false);
+        m_deselectAllBtn->setEnabled(false);
+        m_installSelectedBtn->setEnabled(false);
+        m_lockSelectedBtn->setEnabled(false);
         return;
     }
+    for (const auto &info : updates) {
+        auto *item = new QTreeWidgetItem();
+        item->setText(0, info.name);
+        item->setText(1, info.repository);
+        item->setText(2, info.oldVersion);
+        item->setText(3, info.newVersion);
+        item->setText(4, info.type);
+        item->setCheckState(0, Qt::Checked);
+        item->setData(0, Qt::UserRole, info.name);
+        m_updateTree->addTopLevelItem(item);
+    }
+    m_selectAllBtn->setEnabled(true);
+    m_deselectAllBtn->setEnabled(true);
+    m_installSelectedBtn->setEnabled(true);
+    m_lockSelectedBtn->setEnabled(true);
+}
 
-    auto *dialog = new UpdateListDialog(updates, m_lockManager, this);
-    connect(dialog, &UpdateListDialog::installRequested, this, [this](const QStringList &pkgs) {
-        m_checker->installSelected(pkgs);
-    });
-    connect(dialog, &UpdateListDialog::lockRequested, this, [this](const QString &pkg) {
+QStringList MainWindow::selectedZypperPackages() const
+{
+    QStringList pkgs;
+    for (int i = 0; i < m_updateTree->topLevelItemCount(); ++i) {
+        auto *item = m_updateTree->topLevelItem(i);
+        if (item->checkState(0) == Qt::Checked && item->text(4) == QStringLiteral("zypper"))
+            pkgs.append(item->text(0));
+    }
+    return pkgs;
+}
+
+void MainWindow::onSelectAll()
+{
+    for (int i = 0; i < m_updateTree->topLevelItemCount(); ++i)
+        m_updateTree->topLevelItem(i)->setCheckState(0, Qt::Checked);
+}
+
+void MainWindow::onDeselectAll()
+{
+    for (int i = 0; i < m_updateTree->topLevelItemCount(); ++i)
+        m_updateTree->topLevelItem(i)->setCheckState(0, Qt::Unchecked);
+}
+
+void MainWindow::onInstallSelected()
+{
+    QStringList pkgs = selectedZypperPackages();
+    if (pkgs.isEmpty()) {
+        QMessageBox::information(this, QStringLiteral("No Selection"),
+                                 QStringLiteral("No zypper packages selected."));
+        return;
+    }
+    m_checker->installSelected(pkgs);
+}
+
+void MainWindow::onLockSelected()
+{
+    QStringList pkgs = selectedZypperPackages();
+    for (const QString &pkg : pkgs)
         m_lockManager->addLock(pkg);
-    });
-    dialog->exec();
-    dialog->deleteLater();
 }
 
 void MainWindow::onInstallAll()
@@ -424,7 +546,7 @@ void MainWindow::onCheckFinished(bool success)
 
 void MainWindow::onUpdatesFound(const QList<UpdateInfo> &updates)
 {
-    Q_UNUSED(updates);
+    populateUpdateTree(updates);
     refreshUpdateSummary();
 }
 
@@ -433,12 +555,11 @@ void MainWindow::onInstallFinished(bool success, const QString &message)
     m_progressBar->setVisible(false);
     m_progressLabel->setVisible(false);
     m_installAllBtn->setEnabled(true);
-    m_viewUpdatesBtn->setEnabled(true);
+    m_installSelectedBtn->setEnabled(true);
 
     if (success) {
         m_statusLabel->setText(QStringLiteral("Updates installed successfully"));
-        QMessageBox::information(this, QStringLiteral("Success"),
-                                 QStringLiteral("Updates were installed successfully."));
+        populateUpdateTree({});
     } else {
         m_statusLabel->setText(QStringLiteral("Installation failed"));
         QMessageBox::warning(this, QStringLiteral("Installation Failed"), message);
