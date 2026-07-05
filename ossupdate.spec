@@ -1,11 +1,11 @@
-%define _name opensuse-update-applet
+%define _name ossupdate
 
-Name:           opensuse-update-applet
+Name:           ossupdate
 Version:        1.2.0
 Release:        1
 Summary:        System tray applet for openSUSE zypper/flatpak/snap updates
 License:        GPL-3.0-only
-URL:            https://github.com/antoan-m/opensuse_autoupdate_applet
+URL:            https://github.com/antoan-m/ossupdate
 Source:         %{_name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
@@ -42,8 +42,8 @@ locking, and sudo password storage via system keychain.
 %license LICENSE
 %doc README.md
 %{_bindir}/%{_name}
-%{_datadir}/applications/%{_name}.desktop
-%{_datadir}/icons/hicolor/scalable/apps/%{_name}.svg
+%{_datadir}/applications/ossupdate.desktop
+%{_datadir}/icons/hicolor/scalable/apps/ossupdate.svg
 
 %changelog
 * Sun Jul 05 2026 antoan-m <antoan@localhost.localdomain> 1.2.0-1

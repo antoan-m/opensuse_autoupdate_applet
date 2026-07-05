@@ -285,6 +285,7 @@ void UpdateChecker::doInstall(const QString &pwd, const QStringList &pkgs)
 
     m_process->start(QStringLiteral("sudo"), args);
     m_process->write(pwd.toUtf8() + "\n");
+    m_process->waitForBytesWritten(5000);
     m_process->closeWriteChannel();
 }
 
@@ -299,6 +300,7 @@ void UpdateChecker::doFlatpakInstall()
          << QStringLiteral("update") << QStringLiteral("-y");
     m_process->start(QStringLiteral("sudo"), args);
     m_process->write(m_cachedSudoPassword.toUtf8() + "\n");
+    m_process->waitForBytesWritten(5000);
     m_process->closeWriteChannel();
 }
 
@@ -312,6 +314,7 @@ void UpdateChecker::doSnapInstall(const QString &pwd)
     args << QStringLiteral("-S") << QStringLiteral("snap") << QStringLiteral("refresh");
     m_process->start(QStringLiteral("sudo"), args);
     m_process->write(pwd.toUtf8() + "\n");
+    m_process->waitForBytesWritten(5000);
     m_process->closeWriteChannel();
 }
 
@@ -387,6 +390,7 @@ void UpdateChecker::installSnapUpdates()
                          << QStringLiteral("-S")
                          << QStringLiteral("snap") << QStringLiteral("refresh"));
         m_process->write(pwd.toUtf8() + "\n");
+        m_process->waitForBytesWritten(5000);
         m_process->closeWriteChannel();
     });
 }

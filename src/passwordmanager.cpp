@@ -19,7 +19,7 @@ void PasswordManager::clearCached()
 
 void PasswordManager::savePassword(const QString &password)
 {
-    auto job = new QKeychain::WritePasswordJob(QStringLiteral("opensuse-update-applet"));
+    auto job = new QKeychain::WritePasswordJob(QStringLiteral("ossupdate"));
     job->setKey(QStringLiteral("sudo-password"));
     job->setTextData(password);
     connect(job, &QKeychain::Job::finished, this, [this, password](QKeychain::Job *j) {
@@ -46,7 +46,7 @@ void PasswordManager::getPassword(std::function<void(const QString &)> callback)
 void PasswordManager::deletePassword()
 {
     m_cachedPassword.clear();
-    auto job = new QKeychain::DeletePasswordJob(QStringLiteral("opensuse-update-applet"));
+    auto job = new QKeychain::DeletePasswordJob(QStringLiteral("ossupdate"));
     job->setKey(QStringLiteral("sudo-password"));
     connect(job, &QKeychain::Job::finished, this, [this](QKeychain::Job *j) {
         if (j->error() == QKeychain::NoError || j->error() == QKeychain::EntryNotFound) {
@@ -60,7 +60,7 @@ void PasswordManager::deletePassword()
 
 void PasswordManager::startKeychainRead()
 {
-    auto job = new QKeychain::ReadPasswordJob(QStringLiteral("opensuse-update-applet"));
+    auto job = new QKeychain::ReadPasswordJob(QStringLiteral("ossupdate"));
     job->setKey(QStringLiteral("sudo-password"));
     connect(job, &QKeychain::Job::finished, this, [this](QKeychain::Job *j) {
         auto cb = m_pendingCallback;

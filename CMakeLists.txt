@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(opensuse-update-applet VERSION 1.2.0 LANGUAGES CXX)
+project(ossupdate VERSION 1.2.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -52,9 +52,9 @@ set(RESOURCES
     resources/resources.qrc
 )
 
-add_executable(opensuse-update-applet ${SOURCES} ${HEADERS} ${RESOURCES})
+add_executable(ossupdate ${SOURCES} ${HEADERS} ${RESOURCES})
 
-target_link_libraries(opensuse-update-applet PRIVATE
+target_link_libraries(ossupdate PRIVATE
     Qt6::Widgets
     Qt6::Svg
     Qt6::Network
@@ -63,16 +63,16 @@ target_link_libraries(opensuse-update-applet PRIVATE
 )
 
 if(QTKEYCHAIN_INCLUDE_DIRS)
-    target_include_directories(opensuse-update-applet PRIVATE ${QTKEYCHAIN_INCLUDE_DIRS})
+    target_include_directories(ossupdate PRIVATE ${QTKEYCHAIN_INCLUDE_DIRS})
 endif()
 
-target_include_directories(opensuse-update-applet PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(ossupdate PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-target_compile_definitions(opensuse-update-applet PRIVATE APP_VERSION="${PROJECT_VERSION}")
+target_compile_definitions(ossupdate PRIVATE APP_VERSION="${PROJECT_VERSION}")
 
-install(TARGETS opensuse-update-applet RUNTIME DESTINATION bin)
+install(TARGETS ossupdate RUNTIME DESTINATION bin)
 
-install(FILES opensuse-update-applet.desktop DESTINATION share/applications)
+install(FILES ossupdate.desktop DESTINATION share/applications)
 
 install(FILES resources/icons/app_icon.svg DESTINATION share/icons/hicolor/scalable/apps
-    RENAME opensuse-update-applet.svg)
+    RENAME ossupdate.svg)

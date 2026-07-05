@@ -1,4 +1,4 @@
-# openSUSE Update Applet
+# oSSUpdate
 
 A Qt6 system tray applet that periodically checks for openSUSE system updates and notifies you when updates are available.
 
@@ -24,10 +24,10 @@ A Qt6 system tray applet that periodically checks for openSUSE system updates an
 
 ### Option 1: Prebuilt RPM (easiest)
 
-Download the latest `.rpm` from the [Releases](https://github.com/antoan-m/opensuse_autoupdate_applet/releases) page and install:
+Download the latest `.rpm` from the [Releases](https://github.com/antoan-m/ossupdate/releases) page and install:
 
 ```bash
-sudo zypper --no-gpg-checks install opensuse-update-applet-*.rpm
+sudo zypper --no-gpg-checks install ossupdate-*.rpm
 ```
 
 ### Option 2: Build from Source
@@ -46,15 +46,15 @@ sudo cmake --install build-release
 
 ```bash
 sudo zypper install -y rpm-build
-rpmbuild -ba opensuse-update-applet.spec
-sudo zypper install ~/rpmbuild/RPMS/x86_64/opensuse-update-applet-*.rpm
+rpmbuild -ba oSSUpdate.spec
+sudo zypper install ~/rpmbuild/RPMS/x86_64/ossupdate-*.rpm
 ```
 
 > See [guide.md](guide.md) for all build and install variants.
 
 ## Usage
 
-Run `opensuse-update-applet` from the terminal or your application menu. The app lives in the system tray.
+Run `ossupdate` from the terminal or your application menu. The app lives in the system tray.
 
 - Right-click the tray icon → **Check Now** to trigger an immediate update check
 - Double-click or right-click → **Open Update Manager** to view updates, manage locks, and change settings
@@ -62,7 +62,7 @@ Run `opensuse-update-applet` from the terminal or your application menu. The app
 
 ## Configuration
 
-Settings are stored in `~/.config/OpenSUSE/UpdateApplet.conf`. The sudo password is stored in your system keychain (KDE Wallet / GNOME Keyring / libsecret).
+Settings are stored in `~/.config/oSSUpdate.conf`. The sudo password is stored in your system keychain (KDE Wallet / GNOME Keyring / libsecret).
 
 ## License
 

@@ -35,7 +35,7 @@ MainWindow::MainWindow(UpdateChecker *checker,
     , m_autostartManager(autostartManager)
     , m_selfUpdater(selfUpdater)
 {
-    setWindowTitle(QStringLiteral("openSUSE Update Manager"));
+    setWindowTitle(QStringLiteral("oSS Update Manager"));
     setMinimumSize(770, 690);
     resize(770, 690);
 
@@ -696,7 +696,7 @@ QWidget *MainWindow::createAboutTab()
     layout->setSpacing(12);
     layout->addStretch();
 
-    auto *nameLabel = new QLabel(QStringLiteral("openSUSE Update Applet"));
+    auto *nameLabel = new QLabel(QStringLiteral("oSS Update Applet"));
     nameLabel->setObjectName(QStringLiteral("heading"));
     nameLabel->setAlignment(Qt::AlignCenter);
     layout->addWidget(nameLabel);
@@ -716,8 +716,8 @@ QWidget *MainWindow::createAboutTab()
 
     auto *repoLabel = new QLabel();
     repoLabel->setText(
-        QStringLiteral("<a href='https://github.com/antoan-m/opensuse_autoupdate_applet'>"
-                       "github.com/antoan-m/opensuse_autoupdate_applet</a>"));
+        QStringLiteral("<a href='https://github.com/antoan-m/ossupdate'>"
+                       "github.com/antoan-m/ossupdate</a>"));
     repoLabel->setOpenExternalLinks(true);
     repoLabel->setTextFormat(Qt::RichText);
     repoLabel->setAlignment(Qt::AlignCenter);
@@ -727,7 +727,7 @@ QWidget *MainWindow::createAboutTab()
 
     auto *descLabel = new QLabel(
         QStringLiteral("A system tray applet that periodically checks for\n"
-                       "openSUSE system updates (zypper/flatpak/snap)\n"
+                       "oSS system updates (zypper/flatpak/snap)\n"
                        "and notifies you when updates are available."));
     descLabel->setObjectName(QStringLiteral("subheading"));
     descLabel->setAlignment(Qt::AlignCenter);

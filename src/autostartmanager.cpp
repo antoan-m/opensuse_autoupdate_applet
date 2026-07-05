@@ -26,10 +26,10 @@ void AutostartManager::setEnabled(bool enabled)
             QTextStream out(&file);
             out << "[Desktop Entry]\n"
                 << "Type=Application\n"
-                << "Name=openSUSE Update Applet\n"
-                << "Comment=System tray applet for openSUSE updates\n"
+                << "Name=oSSUpdate\n"
+                << "Comment=System tray applet for updating oSS\n"
                 << "Exec=" << execPath << "\n"
-                << "Icon=opensuse-update-applet\n"
+                << "Icon=ossupdate\n"
                 << "Categories=System;Utility;\n"
                 << "Terminal=false\n"
                 << "StartupNotify=false\n"
@@ -45,13 +45,13 @@ void AutostartManager::setEnabled(bool enabled)
 QString AutostartManager::desktopFilePath() const
 {
     return QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)
-           + QStringLiteral("/autostart/opensuse-update-applet.desktop");
+           + QStringLiteral("/autostart/ossupdate.desktop");
 }
 
 QString AutostartManager::resolveExecutablePath() const
 {
-    QString path = QStandardPaths::findExecutable(QStringLiteral("opensuse-update-applet"));
+    QString path = QStandardPaths::findExecutable(QStringLiteral("ossupdate"));
     if (!path.isEmpty())
         return path;
-    return QStringLiteral("/usr/bin/opensuse-update-applet");
+    return QStringLiteral("/usr/bin/ossupdate");
 }

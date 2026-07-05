@@ -20,7 +20,7 @@ TrayManager::TrayManager(UpdateChecker *checker, QWidget *mainWindow, QObject *p
 {
     buildMenu();
     m_trayIcon->setContextMenu(m_menu);
-    m_trayIcon->setToolTip(QStringLiteral("openSUSE Update Applet"));
+    m_trayIcon->setToolTip(QStringLiteral("oSSUpdate"));
 
     connect(Settings::instance(), &Settings::iconStyleChanged, this, [this](bool) {
         createIcon(m_currentState);

@@ -25,9 +25,9 @@ static QString loadStyleSheet(bool dark)
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    app.setApplicationName(QStringLiteral("opensuse-update-applet"));
-    app.setApplicationDisplayName(QStringLiteral("openSUSE Update Applet"));
-    app.setOrganizationName(QStringLiteral("OpenSUSE"));
+    app.setApplicationName(QStringLiteral("ossupdate"));
+    app.setApplicationDisplayName(QStringLiteral("oSSUpdate"));
+    app.setOrganizationName(QStringLiteral("OSS"));
     app.setQuitOnLastWindowClosed(false);
 
     bool darkMode = app.styleHints()->colorScheme() == Qt::ColorScheme::Dark;

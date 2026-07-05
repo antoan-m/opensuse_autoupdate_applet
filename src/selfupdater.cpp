@@ -36,10 +36,10 @@ void SelfUpdater::checkNow()
         return;
     m_checking = true;
 
-    QUrl url(QStringLiteral("https://api.github.com/repos/antoan-m/opensuse_autoupdate_applet/releases/latest"));
+    QUrl url(QStringLiteral("https://api.github.com/repos/antoan-m/ossupdate/releases/latest"));
     QNetworkRequest req(url);
     req.setRawHeader("Accept", "application/vnd.github+json");
-    req.setRawHeader("User-Agent", "opensuse-update-applet/" APP_VERSION);
+    req.setRawHeader("User-Agent", "ossupdate/" APP_VERSION);
 
     QNetworkReply *reply = m_network->get(req);
     connect(reply, &QNetworkReply::finished, this, &SelfUpdater::onApiReplyFinished);
@@ -112,7 +112,7 @@ void SelfUpdater::parseApiResponse(const QByteArray &data)
 void SelfUpdater::startDownload(const QString &url)
 {
     QNetworkRequest req{QUrl(url)};
-    req.setRawHeader("User-Agent", "opensuse-update-applet/" APP_VERSION);
+    req.setRawHeader("User-Agent", "ossupdate/" APP_VERSION);
 
     QNetworkReply *reply = m_network->get(req);
     connect(reply, &QNetworkReply::downloadProgress, this, &SelfUpdater::downloadProgress);
@@ -192,7 +192,7 @@ void SelfUpdater::downloadAndInstall()
         emit installFinished(false, QStringLiteral("No download URL available"));
         return;
     }
-    m_downloadedPath = QDir::tempPath() + QStringLiteral("/opensuse-update-applet-") +
+    m_downloadedPath = QDir::tempPath() + QStringLiteral("/ossupdate-") +
                        m_latestVersion.toString() + QStringLiteral(".rpm");
     startDownload(m_latestDownloadUrl);
 }

@@ -10,7 +10,7 @@ Settings *Settings::instance()
 }
 
 Settings::Settings()
-    : m_settings(QStringLiteral("OpenSUSE"), QStringLiteral("UpdateApplet"))
+    : m_settings(QStringLiteral("OSS"), QStringLiteral("UpdateApplet"))
 {
 }
 
